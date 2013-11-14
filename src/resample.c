@@ -7,7 +7,7 @@
   Based on resample-1.7:
     http://www-ccrma.stanford.edu/~jos/resample/
 
-  License: LGPL - see the file LICENSE.txt for more information
+  Dual-licensed as LGPL and BSD; see README.md and LICENSE* files.
 
   This is the main source file, implementing all of the API
   functions and handling all of the buffering logic.

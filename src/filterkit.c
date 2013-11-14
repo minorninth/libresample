@@ -7,7 +7,7 @@
   Based on resample-1.7:
     http://www-ccrma.stanford.edu/~jos/resample/
 
-  License: LGPL - see the file LICENSE.txt for more information
+  Dual-licensed as LGPL and BSD; see README.md and LICENSE* files.
 
   This file provides Kaiser-windowed low-pass filter support,
   including a function to create the filter coefficients, and
