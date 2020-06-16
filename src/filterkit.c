@@ -20,6 +20,10 @@
 
 #include "filterkit.h"
 
+#ifdef __SSE4_1__
+#include <xmmintrin.h>
+#endif
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -202,7 +206,42 @@ float lrsFilterUD(float Imp[],  /* impulse response */
          Ho += dhb;		/* IR step */
          Xp += Inc;		/* Input signal step. NO CHECK ON BOUNDS */
       }
-   else 
+   else {
+#ifdef __SSE4_1__
+      __m128i vv = _mm_set1_ps(0.0f);
+      if (Inc == 1) {
+         while ((Hp = &Imp[(int)(Ho + 4*dhb)]) < End) {
+            /* Get IR sample */
+            __m128i vt = _mm_set_ps(Imp[(int)(Ho + 3 * dhb)],
+                                    Imp[(int)(Ho + 2*dhb)],
+                                    Imp[(int)(Ho + dhb)],
+                                    Imp[(int)(Ho)]);
+            vt = _mm_mul_ps(vt, _mm_loadu_ps(Xp));/* Mult coeff by input
+                                                     sample */
+            vv = _mm_add_ps(vv, vt);			/* The filter output */
+            Ho += 4*dhb;		/* IR step */
+            Xp += 4;		/* Input signal step. NO CHECK ON BOUNDS */
+         }
+      } else {
+         while ((Hp = &Imp[(int)(Ho + 4*dhb)]) < End) {
+            /* Get IR sample */
+            __m128i vt = _mm_set_ps(Imp[(int)(Ho)],
+                                    Imp[(int)(Ho + dhb)],
+                                    Imp[(int)(Ho + 2*dhb)],
+                                    Imp[(int)(Ho + 3*dhb)]);
+            vt = _mm_mul_ps(vt, _mm_loadu_ps(Xp - 3)); /* Mult coeff by input
+                                                          sample */
+            vv = _mm_add_ps(vv, vt);			/* The filter output */
+            Ho += 4*dhb;		/* IR step */
+            Xp -= 4;		/* Input signal step. NO CHECK ON BOUNDS */
+         }
+      }
+      float elems[4];
+      memcpy(elems, &vv, sizeof(vv));
+      v = elems[0] + elems[1] + elems[2] + elems[3];
+      // Fallthrough intended: the rest of the loop is done in a non-vectorized
+      // way.
+#endif
       while ((Hp = &Imp[(int)Ho]) < End) {
          t = *Hp;		/* Get IR sample */
          t *= *Xp;		/* Mult coeff by input sample */
@@ -210,6 +249,6 @@ float lrsFilterUD(float Imp[],  /* impulse response */
          Ho += dhb;		/* IR step */
          Xp += Inc;		/* Input signal step. NO CHECK ON BOUNDS */
       }
-
+   }
    return v;
 }
