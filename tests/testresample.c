@@ -19,6 +19,8 @@
 
 #define MIN(A, B) (A) < (B)? (A) : (B)
 
+int global_error;
+
 void runtest(int srclen, double freq, double factor,
              int srcblocksize, int dstblocksize)
 {
@@ -65,10 +67,12 @@ void runtest(int srclen, double freq, double factor,
 
    if (o < 0) {
       printf("Error: resample_process returned an error: %d\n", o);
+      global_error = 1;
    }
 
    if (out <= 0) {
       printf("Error: resample_process returned %d samples\n", out);
+      global_error = 1;
       free(src);
       free(dst);
       return;
@@ -79,15 +83,16 @@ void runtest(int srclen, double freq, double factor,
       printf("   Expected ~%d, got %d samples out\n",
              expectedlen, out);
    }
-   
+
    sum = 0.0;
    sumsq = 0.0;
    errcount = 0.0;
 
-   /* Don't compute statistics on all output values; the last few
-      are guaranteed to be off because it's based on far less
-      interpolation. */
-   statlen = out - fwidth;
+   /* Don't compute statistics on all output values; the last small fraction
+      are guaranteed to be off since they are interpolated based on far fewer
+      values. When upsampling, the length of the range where this concern
+      applies is in direct proportion to the upsampling factor. */
+   statlen = out - ((int)round(fwidth * factor));
 
    for(i=0; i<statlen; i++) {
       double diff = sin((i/freq)/factor) - dst[i];
@@ -117,6 +122,7 @@ void runtest(int srclen, double freq, double factor,
       printf("   i=%d:  expected %.3f, got %.3f\n",
              i, sin((i/freq)/factor), dst[i]);
       printf("   At least %d samples had significant error.\n", errcount);
+      global_error = 1;
    }
    err = sum / statlen;
    rmserr = sqrt(sumsq / statlen);
@@ -129,6 +135,8 @@ int main(int argc, char **argv)
 {
    int i, srclen, dstlen, ifreq;
    double factor;
+
+   global_error = 0;
 
    printf("\n*** Vary source block size*** \n\n");
    srclen = 10000;
@@ -172,11 +180,19 @@ int main(int argc, char **argv)
    printf("\n*** Resample with different factors ***\n\n");
    srclen = 10000;
    ifreq = 100;
-   for(i=0; i<100; i++) {
-      factor = ((rand() % 64) + 1) / 4.0;
+   for (i = 1; i < 64; i++) {
+      factor = i / 4.0;
       dstlen = (int)(srclen * factor + 10);
       runtest(srclen, (double)ifreq, factor, srclen, dstlen);
    }
 
-   return 0;
+   printf("\n*** Resample with large factors ***\n\n");
+   srclen = 200;
+   ifreq = 100;
+   for (factor = 25.0; factor < 1000.0; factor *= 1.7) {
+      dstlen = (int)(srclen * factor + 10);
+      runtest(srclen, (double)ifreq, factor, srclen, dstlen);
+   }
+
+   return global_error;
 }
