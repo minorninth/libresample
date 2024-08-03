@@ -6,9 +6,11 @@ Real-time library interface by Dominic Mazzoni
 Based on resample-1.7:
   http://www-ccrma.stanford.edu/~jos/resample/
 
-Two licenses available:
-License: LGPL - see LICENSE-LGPL.txt
-License: BSD - see LICENSE-BSD.txt
+This software is available for use under the terms of either the
+BSD License or the LGPL License, at your option - see:
+
+    LICENSE-LGPL.txt
+    LICENSE-BSD.txt
 
 History:
 
@@ -94,6 +96,8 @@ CCRMA version.
 
 Permission to use and copy is also granted subject to the terms of the
 BSD license found in LICENSE-BSD.txt.
+
+You can choose either license to comply with, at your option.
 
 Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:
