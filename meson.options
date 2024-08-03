@@ -1,0 +1,13 @@
+option(
+  'libsndfile',
+  type : 'feature',
+  value : 'auto',
+  description : 'Build the resample-sndfile tool (depends on libsndfile)',
+)
+
+option(
+  'libsamplerate',
+  type : 'feature',
+  value : 'auto',
+  description : 'Compare against libsamplerate for testing',
+)
