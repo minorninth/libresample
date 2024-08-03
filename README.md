@@ -58,7 +58,11 @@ Changes in version 0.1.4:
 
 * Uploaded to GitHub: http://github.com/minorninth/libresample
 
-Usage notes:  
+Changes in version 0.1.5:
+
+* Added a new build system using Meson.
+
+Usage notes:
 
 - If the output buffer you pass is too small, resample_process
   may not use any input samples because its internal output
@@ -73,6 +77,21 @@ Usage notes:
   output samples might be between 7992 and 8008.  Do not
   assume that it will be exactly 8000.  If you need exactly
   8000 outputs, pad the input with extra zeros as necessary.
+
+Build instructions:
+
+libresample can be built with [Meson](https://mesonbuild.com/),
+with the standard Autotools `./configure && make`, or with the
+included Visual Studio 2005 project file.
+
+The Meson build should generally be preferred. In particular,
+it is strongly recommended that downstream distribution
+packagers use the Meson build system for reasons of
+interoperability, as it generates a pkg-config file, supports
+building a shared library, can automatically run the tests, and
+runs on both Unix-like platforms and Windows. The older Autotools
+build system is retained for projects that already embed it into
+their builds and systems that do not have Meson.
 
 License and warranty:
 
