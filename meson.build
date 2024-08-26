@@ -4,7 +4,7 @@ project(
   meson_version : '>=1.3',
   default_options : 'default_library=both',
   version : '0.1.5',
-  license : 'BSD-3-Clause OR LGPL-2.1-or-later',
+  license : 'BSD-2-Clause OR LGPL-2.1-or-later',
   license_files : ['LICENSE-BSD.txt', 'LICENSE-LGPL.txt'],
 )
 
